@@ -25,3 +25,4 @@ upload:
 
 jwt:
     secret: my2secVerifyPKCS1v1sdsa5retkey
+    adminsecret: adminrifyPKCS1v1sdsa5retkey

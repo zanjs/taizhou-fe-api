@@ -24,8 +24,8 @@ type (
 		CommentCount uint   `json:"commentCount"` // 评论数
 		CollectCount uint   `json:"collectCount"` // 收藏数
 		LaudCount    uint   `json:"laudCount"`    // 赞数
-		AvatarURL    string `json:"avatarURL"`    //头像
-		CoverURL     string `json:"coverURL"`     //个人主页背景图片URL
+		AvatarURL    string `json:"avatar_url"`   //头像
+		CoverURL     string `json:"cover_url"`    //个人主页背景图片URL
 		Signature    string `json:"signature"`    //个人签名
 	}
 

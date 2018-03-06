@@ -13,31 +13,14 @@ type (
 	}
 )
 
-// Create is category new
-func (c Category) Create(ctx iris.Context) {
-	u := &models.Category{}
-	if err := ctx.ReadJSON(u); err != nil {
-		response.JSONError(ctx, err.Error())
-		return
-	}
+// GetAll is category new
+func (c Category) GetAll(ctx iris.Context) {
 
-	if u.Name == "" {
-		response.JSONError(ctx, "Name where?")
-		return
-	}
-
-	cate, _ := models.Category{}.GetByName(u.Name)
-
-	if cate.Name != "" {
-		response.JSONError(ctx, "名称已存在")
-		return
-	}
-
-	err := models.Category{}.Create(u)
+	datas, err := models.Category{}.GetAll()
 	if err != nil {
 		response.JSONError(ctx, err.Error())
 		return
 	}
 
-	response.JSON(ctx, "创建成功")
+	response.JSON(ctx, datas)
 }

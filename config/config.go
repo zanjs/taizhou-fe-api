@@ -27,7 +27,8 @@ var Config = struct {
 		Password string `required:"true" env:"DBPassword"`
 	}
 	JWT struct {
-		Secret string
+		Secret      string
+		AdminSecret string
 	}
 	Upload struct {
 		Path string `default:"uploads/m"`

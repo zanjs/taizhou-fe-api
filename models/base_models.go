@@ -50,6 +50,9 @@ type (
 	ArticleIDModel struct {
 		ArticleID string `json:"article_id"` //文章 ID
 	}
+	StatusModel struct {
+		Status int `json:"status"`
+	}
 )
 
 // BaseModel is

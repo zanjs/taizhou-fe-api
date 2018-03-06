@@ -1,6 +1,8 @@
 package app
 
 import (
+	"anla.io/taizhou-fe-api/app/jwt"
+	"anla.io/taizhou-fe-api/app/router"
 	"anla.io/taizhou-fe-api/config"
 	"anla.io/taizhou-fe-api/handler"
 	"anla.io/taizhou-fe-api/handler/comment"
@@ -13,7 +15,6 @@ import (
 
 var (
 	appConf = config.Config.APP
-	jwtConf = config.Config.JWT
 )
 
 // InitApp is
@@ -40,12 +41,16 @@ func InitApp() {
 	{
 		v1.Post("/login", handler.PostLogin)
 		v1.Post("/register", handler.Register{}.Add)
-		v1.Get("/", jwtHandler.Serve, handler.Controller{}.JWTHandler)
+		v1.Get("/", jwt.JwtHandler.Serve, handler.Controller{}.JWTHandler)
 	}
+
+	router.AdminRouter(v1)
 
 	Au := v1.Party("/a")
 	Op := v1.Party("/o")
-	Au.Use(jwtHandler.Serve)
+	Au.Use(jwt.JwtHandler.Serve)
+
+	Op.Get("/category", handler.Category{}.GetAll)
 
 	AuUser := Au.Party("/user")
 	{
@@ -60,11 +65,6 @@ func InitApp() {
 	{
 		OpAriticle.Get("/", handler.Article{}.All)
 		OpAriticle.Get("/{id:string}", handler.Article{}.Get)
-	}
-
-	AuCategory := Au.Party("/category")
-	{
-		AuCategory.Post("/", handler.Category{}.Create)
 	}
 
 	AuUpload := Au.Party("/upload")
