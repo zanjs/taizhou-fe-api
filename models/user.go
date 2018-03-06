@@ -101,3 +101,34 @@ func (s User) GetByID(id string) (User, error) {
 
 	return user, err
 }
+
+// GetAll is find
+func (s User) GetAll(page *PageModel) ([]User, error) {
+	var (
+		data []User
+		err  error
+	)
+
+	if page.Num < 1 {
+		page.Num = 1
+	}
+
+	pageSize := 2
+	offset := (page.Num - 1) * pageSize
+
+	tx := gorm.MysqlConn().Begin()
+
+	if err = tx.Find(&data).Count(&page.Count).Error; err != nil {
+		tx.Rollback()
+		return data, err
+	}
+
+	if err = tx.Offset(offset).Limit(pageSize).Find(&data).Error; err != nil {
+		tx.Rollback()
+		return data, err
+	}
+
+	tx.Commit()
+
+	return data, err
+}

@@ -5,7 +5,6 @@ import (
 	"anla.io/taizhou-fe-api/app/router"
 	"anla.io/taizhou-fe-api/config"
 	"anla.io/taizhou-fe-api/handler"
-	"anla.io/taizhou-fe-api/handler/comment"
 	"anla.io/taizhou-fe-api/middleware"
 
 	"github.com/kataras/iris"
@@ -45,37 +44,11 @@ func InitApp() {
 	}
 
 	router.AdminRouter(v1)
-
-	Au := v1.Party("/a")
-	Op := v1.Party("/o")
-	Au.Use(jwt.JwtHandler.Serve)
-
-	Op.Get("/category", handler.Category{}.GetAll)
-
-	AuUser := Au.Party("/user")
-	{
-		AuUser.Get("/me", handler.User{}.GetMe)
-	}
-
-	AuArticle := Au.Party("/article")
-	{
-		AuArticle.Post("/", handler.Article{}.Create)
-	}
-	OpAriticle := Op.Party("/article")
-	{
-		OpAriticle.Get("/", handler.Article{}.All)
-		OpAriticle.Get("/{id:string}", handler.Article{}.Get)
-	}
-
-	AuUpload := Au.Party("/upload")
-	{
-		AuUpload.Post("/file", handler.UploadFile)
-	}
-
-	AuComment := Au.Party("/comment")
-	{
-		AuComment.Post("/", comment.Comment{}.Save)
-	}
+	router.UserRouter(v1)
+	router.ArticleRouter(v1)
+	router.CategoryRouter(v1)
+	router.CommentRouter(v1)
+	router.FileRouter(v1)
 
 	// navigate to defafult config http://localhost:8080
 	if err := app.Run(iris.Addr(":"+appConf.Port), iris.WithoutBanner); err != nil {
