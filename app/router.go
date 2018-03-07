@@ -1,7 +1,6 @@
 package app
 
 import (
-	"anla.io/taizhou-fe-api/app/jwt"
 	"anla.io/taizhou-fe-api/app/router"
 	"anla.io/taizhou-fe-api/config"
 	"anla.io/taizhou-fe-api/handler"
@@ -37,12 +36,6 @@ func InitApp() {
 	app.Get("/suuid", handler.UUID{}.Create)
 
 	v1 := app.Party("/api/v1")
-	{
-		v1.Post("/login", handler.PostLogin)
-		v1.Post("/register", handler.Register{}.Add)
-		v1.Get("/", jwt.JwtHandler.Serve, handler.Controller{}.JWTHandler)
-	}
-
 	router.AdminRouter(v1)
 	router.UserRouter(v1)
 	router.ArticleRouter(v1)

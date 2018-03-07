@@ -83,6 +83,7 @@ type IDCreateModel struct {
 type PageModel struct {
 	Offset int `json:"offset"`
 	Limit  int `json:"limit"`
+	Size   int `json:"size"`
 	Count  int `json:"count"`
 	Num    int `json:"num"`
 }

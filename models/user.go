@@ -5,7 +5,6 @@ import (
 
 	"anla.io/taizhou-fe-api/db"
 	"github.com/houndgo/suuid"
-	gm "github.com/jinzhu/gorm"
 )
 
 type (
@@ -17,16 +16,18 @@ type (
 	User struct {
 		BaseModel
 		UserName
-		Email        string `json:"-" gorm:"type:varchar(100);unique"`
+		Email        string `json:"email" gorm:"type:varchar(100);unique"`
 		Password     string `json:"-"`
 		Experience   uint   `json:"experience"`
-		ArticleCount uint   `json:"articleCount"` // 文章数
-		CommentCount uint   `json:"commentCount"` // 评论数
-		CollectCount uint   `json:"collectCount"` // 收藏数
-		LaudCount    uint   `json:"laudCount"`    // 赞数
-		AvatarURL    string `json:"avatar_url"`   //头像
-		CoverURL     string `json:"cover_url"`    //个人主页背景图片URL
-		Signature    string `json:"signature"`    //个人签名
+		ArticleCount uint   `json:"article_count"` // 文章数
+		CommentCount uint   `json:"comment_count"` // 评论数
+		CollectCount uint   `json:"collect_count"` // 收藏数
+		LaudCount    uint   `json:"laud_count"`    // 赞数
+		AvatarURL    string `json:"avatar_url"`    //头像
+		CoverURL     string `json:"cover_url"`     //个人主页背景图片URL
+		Signature    string `json:"signature"`     //个人签名
+		Role         int    `json:"role"`          //角色
+		StatusModel
 	}
 
 	// UserShort is
@@ -37,6 +38,9 @@ type (
 	// UserLogin is
 	UserLogin struct {
 		UserName
+		Role     int    `json:"role"` //角色
+		Email    string `json:"email" gorm:"type:varchar(100);unique"`
+		Type     int    `json:"type" gorm:"-"` // 登陆类型 1 = 后台， 不填写为普通用户
 		Password string `json:"password"`
 	}
 )
@@ -47,16 +51,17 @@ func (UserShort) TableName() string {
 }
 
 //BeforeSave is
-func (s *User) BeforeSave(scope *gm.Scope) (err error) {
-	s.ID = suuid.New().String()
-	return err
-}
+// func (s *User) BeforeSave(scope *gm.Scope) (err error) {
+// 	s.ID = suuid.New().String()
+// 	return err
+// }
 
 // Create is user
 func (s User) Create(m *User) error {
 	var (
 		err error
 	)
+	m.ID = suuid.New().String()
 	m.CreatedAt = time.Now()
 	tx := gorm.MysqlConn().Begin()
 	if err = tx.Create(&m).Error; err != nil {
@@ -77,6 +82,23 @@ func (s User) GetByUsername(username string) (User, error) {
 
 	tx := gorm.MysqlConn().Begin()
 	if err = tx.Find(&user, "username = ?", username).Error; err != nil {
+		tx.Rollback()
+		return user, err
+	}
+	tx.Commit()
+
+	return user, err
+}
+
+// GetByEmail is find user
+func (s User) GetByEmail(data string) (User, error) {
+	var (
+		user User
+		err  error
+	)
+
+	tx := gorm.MysqlConn().Begin()
+	if err = tx.Find(&user, "email = ?", data).Error; err != nil {
 		tx.Rollback()
 		return user, err
 	}
@@ -113,8 +135,11 @@ func (s User) GetAll(page *PageModel) ([]User, error) {
 		page.Num = 1
 	}
 
-	pageSize := 2
-	offset := (page.Num - 1) * pageSize
+	if page.Size == 0 {
+		page.Size = 3
+	}
+
+	offset := (page.Num - 1) * page.Size
 
 	tx := gorm.MysqlConn().Begin()
 
@@ -123,7 +148,7 @@ func (s User) GetAll(page *PageModel) ([]User, error) {
 		return data, err
 	}
 
-	if err = tx.Offset(offset).Limit(pageSize).Find(&data).Error; err != nil {
+	if err = tx.Order("created_at desc").Offset(offset).Limit(page.Size).Find(&data).Error; err != nil {
 		tx.Rollback()
 		return data, err
 	}

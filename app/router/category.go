@@ -1,7 +1,7 @@
 package router
 
 import (
-	"anla.io/taizhou-fe-api/handler"
+	"anla.io/taizhou-fe-api/handler/category"
 	"github.com/kataras/iris"
 )
 
@@ -9,6 +9,6 @@ import (
 func CategoryRouter(party iris.Party) {
 	o := party.Party("/category")
 	{
-		o.Get("/", handler.Category{}.GetAll)
+		o.Get("/", category.Category{}.GetAll)
 	}
 }

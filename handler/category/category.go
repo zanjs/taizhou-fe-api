@@ -1,6 +1,8 @@
-package handler
+package category
 
 import (
+	"anla.io/taizhou-fe-api/handler"
+	"anla.io/taizhou-fe-api/middleware"
 	"anla.io/taizhou-fe-api/models"
 	"anla.io/taizhou-fe-api/response"
 	"github.com/kataras/iris"
@@ -9,18 +11,20 @@ import (
 type (
 	// Category is
 	Category struct {
-		Controller
+		handler.Controller
 	}
 )
 
 // GetAll is category new
 func (c Category) GetAll(ctx iris.Context) {
 
-	datas, err := models.Category{}.GetAll()
+	page := middleware.GetPage(ctx)
+
+	datas, err := models.Category{}.GetAll(&page)
 	if err != nil {
 		response.JSONError(ctx, err.Error())
 		return
 	}
 
-	response.JSON(ctx, datas)
+	response.JSONPage(ctx, datas, page)
 }

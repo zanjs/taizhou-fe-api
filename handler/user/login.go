@@ -1,4 +1,4 @@
-package handler
+package user
 
 import (
 	"time"
@@ -13,8 +13,8 @@ import (
 
 var jwtConfig = config.Config.JWT
 
-// PostLogin is login get token
-func PostLogin(ctx iris.Context) {
+// Login is login get token
+func Login(ctx iris.Context) {
 
 	u := &models.UserLogin{}
 	if err := ctx.ReadJSON(u); err != nil {
@@ -39,6 +39,11 @@ func PostLogin(ctx iris.Context) {
 		return
 	}
 
+	if u.Type == 1 && user.Role < models.UserRols.Edit {
+		response.JSONError(ctx, "权限不够，请联系管理员")
+		return
+	}
+
 	// hashPassword := utils.HashPassword(u.Password)
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(u.Password))
@@ -55,6 +60,7 @@ func PostLogin(ctx iris.Context) {
 	claims := token.Claims.(jwt.MapClaims)
 	claims["id"] = user.ID
 	// claims["username"] = user.Username
+	claims["role"] = user.Role
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 	// Generate encoded token and send it as response.

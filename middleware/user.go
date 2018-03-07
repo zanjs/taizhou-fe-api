@@ -1,4 +1,4 @@
-package admin
+package middleware
 
 import (
 	"fmt"
@@ -8,12 +8,11 @@ import (
 	"github.com/kataras/iris"
 )
 
-// Controller is admin base controller
-type Controller struct{}
+type User struct{}
 
 // GetUser 获取用户信息
-func (ctl Controller) GetUser(ctx iris.Context) models.AdminUser {
-	user := models.AdminUser{}
+func (c User) GetUser(ctx iris.Context) models.User {
+	user := models.User{}
 	userJwt := ctx.Values().Get("jwt").(*jwt.Token)
 	claims := userJwt.Claims.(jwt.MapClaims)
 	// userID := uint(claims["id"].(float64))
@@ -21,6 +20,7 @@ func (ctl Controller) GetUser(ctx iris.Context) models.AdminUser {
 	userID := claims["id"].(string)
 	fmt.Println(userID)
 	user.ID = userID
+	user.Role = int(claims["role"].(float64))
 	fmt.Println(user)
 	// user.Username = claims["username"].(string)
 	return user

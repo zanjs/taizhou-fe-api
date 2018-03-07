@@ -2,7 +2,10 @@ package router
 
 import (
 	"anla.io/taizhou-fe-api/app/jwt"
+	"anla.io/taizhou-fe-api/handler"
 	"anla.io/taizhou-fe-api/handler/admin"
+	"anla.io/taizhou-fe-api/handler/user"
+	"anla.io/taizhou-fe-api/middleware"
 	"github.com/kataras/iris"
 )
 
@@ -10,15 +13,15 @@ import (
 func AdminRouter(adminParty iris.Party) {
 	ad := adminParty.Party("/admin")
 	{
-		ad.Post("/register", admin.Register{}.Add)
-		ad.Post("/login", admin.Login)
+		ad.Post("/login", user.Login)
 	}
 
-	adAuth := ad.Party("/a", jwt.JwtHandlerAdmin.Serve)
+	adAuth := ad.Party("/a", jwt.JwtHandler.Serve)
 	{
-		adAuth.Get("/user/info", admin.User{}.GetMe)
-		adAuth.Get("/user", admin.User{}.GetAll)
-		adAuth.Post("/user/logout", admin.User{}.GetMe)
-		adAuth.Post("/category", admin.Category{}.Create)
+		adAuth.Get("/user", user.User{}.GetAll)
+		adAuth.Post("/user/logout", user.User{}.GetMe)
+		adAuth.Post("/category", middleware.Edit, admin.Category{}.Create)
+		adAuth.Put("/category", middleware.Edit, admin.Category{}.Update)
+		adAuth.Post("/register", middleware.Edit, handler.Register{}.AdminAdd)
 	}
 }

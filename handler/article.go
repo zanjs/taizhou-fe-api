@@ -18,8 +18,8 @@ type (
 
 // Create is
 func (ctl Article) Create(ctx iris.Context) {
-	u := &models.Article{}
-	if err := ctx.ReadJSON(u); err != nil {
+	u := models.Article{}
+	if err := ctx.ReadJSON(&u); err != nil {
 		response.JSONError(ctx, err.Error())
 		return
 	}
@@ -38,7 +38,7 @@ func (ctl Article) Create(ctx iris.Context) {
 
 	u.UserID = user.ID
 
-	err := models.Article{}.Create(u)
+	err := models.Article{}.Create(&u)
 	if err != nil {
 		response.JSONError(ctx, err.Error())
 		return

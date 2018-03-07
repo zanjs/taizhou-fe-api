@@ -59,14 +59,15 @@ func (a Article) Create(m *Article) error {
 	rows := [][]interface{}{}
 
 	// pics := &m.Pics
-	createTime := time.Now()
+
 	for i := 0; i < len(m.Pics); i++ {
 		m.Pics[i].ArticleID = m.ID
+		m.Pics[i].CreatedAt = time.Now()
 		uid := suuid.New().String()
 		m.Pics[i].ID = uid
 		rows = append(rows, []interface{}{
 			m.ID,
-			createTime,
+			m.Pics[i].CreatedAt,
 			m.Pics[i].Src,
 			uid,
 		})
@@ -120,9 +121,39 @@ func (a Article) GetAll(page *PageModel) ([]Article, error) {
 	// tx.Model(&data).Related(&pics)
 	// tx.Model(&data).Related(&pics, "Pics")
 	// tx.Model(&data).Association("Pics")
+	tx.Commit()
 
-	// fmt.Println(pics)
+	return data, err
+}
 
+// GetAllNews is find
+func (a Article) GetAllNews(page *PageModel) ([]Article, error) {
+	var (
+		data []Article
+		err  error
+	)
+
+	if page.Num < 1 {
+		page.Num = 1
+	}
+
+	pageSize := 2
+	offset := (page.Num - 1) * pageSize
+
+	tx := gorm.MysqlConn().Begin()
+
+	if err = tx.Preload("User").Preload("Pics").Where("content_type = ?", ArticleType.New).Find(&data).Count(&page.Count).Error; err != nil {
+		tx.Rollback()
+		return data, err
+	}
+
+	if err = tx.Offset(offset).Limit(pageSize).Preload("User").Preload("Pics").Where("content_type = ?", ArticleType.New).Find(&data).Error; err != nil {
+		tx.Rollback()
+		return data, err
+	}
+	// tx.Model(&data).Related(&pics)
+	// tx.Model(&data).Related(&pics, "Pics")
+	// tx.Model(&data).Association("Pics")
 	tx.Commit()
 
 	return data, err

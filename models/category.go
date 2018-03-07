@@ -5,7 +5,6 @@ import (
 
 	"anla.io/taizhou-fe-api/db"
 	"github.com/houndgo/suuid"
-	gm "github.com/jinzhu/gorm"
 )
 
 type (
@@ -18,16 +17,10 @@ type (
 	}
 )
 
-//BeforeSave is
-func (a *Category) BeforeSave(scope *gm.Scope) (err error) {
-	a.ID = suuid.New().String()
-	return err
-}
-
 // Create is
 func (a Category) Create(m *Category) error {
 	var err error
-
+	m.ID = suuid.New().String()
 	m.CreatedAt = time.Now()
 	tx := gorm.MysqlConn().Begin()
 	if err = tx.Create(&m).Error; err != nil {
@@ -37,6 +30,43 @@ func (a Category) Create(m *Category) error {
 	tx.Commit()
 
 	return err
+}
+
+// Update is
+func (a *Category) Update(m *Category) error {
+	var err error
+
+	a.UpdatedAt = time.Now()
+	a.Name = m.Name
+	a.Sort = m.Sort
+	a.Disabled = m.Disabled
+
+	tx := gorm.MysqlConn().Begin()
+
+	if err = tx.Save(&a).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+
+	return err
+}
+
+// GetByID is find Category
+func (a Category) GetByID(id string) (Category, error) {
+	var (
+		data Category
+		err  error
+	)
+
+	tx := gorm.MysqlConn().Begin()
+	if err = tx.Find(&data, "id = ?", id).Error; err != nil {
+		tx.Rollback()
+		return data, err
+	}
+	tx.Commit()
+
+	return data, err
 }
 
 // GetByName is
@@ -57,17 +87,34 @@ func (a Category) GetByName(name string) (Category, error) {
 }
 
 // GetAll is find
-func (a Category) GetAll() ([]Category, error) {
+func (a Category) GetAll(page *PageModel) ([]Category, error) {
 	var (
 		data []Category
 		err  error
 	)
 
+	if page.Num < 1 {
+		page.Num = 1
+	}
+
+	if page.Size == 0 {
+		page.Size = 3
+	}
+
+	offset := (page.Num - 1) * page.Size
+
 	tx := gorm.MysqlConn().Begin()
-	if err = tx.Find(&data).Error; err != nil {
+
+	if err = tx.Find(&data).Count(&page.Count).Error; err != nil {
 		tx.Rollback()
 		return data, err
 	}
+
+	if err = tx.Order("sort desc,created_at desc").Offset(offset).Limit(page.Size).Find(&data).Error; err != nil {
+		tx.Rollback()
+		return data, err
+	}
+
 	tx.Commit()
 
 	return data, err

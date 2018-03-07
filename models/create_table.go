@@ -11,7 +11,6 @@ func CreateTable() error {
 		&Article{},
 		&ArticlePic{},
 		&Category{},
-		&AdminUser{},
 		&Comment{})
 	return nil
 }

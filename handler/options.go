@@ -7,5 +7,5 @@ import (
 
 // OptionsHandler is
 func OptionsHandler(ctx iris.Context) {
-	response.JSON(ctx, "hello")
+	response.JSON(ctx, "z")
 }

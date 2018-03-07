@@ -7,7 +7,7 @@ import (
 
 // JWTError is
 func JWTError(ctx iris.Context, str string) {
-	response.JSONError(ctx, str)
+	response.JSONErrorCode(ctx, str, response.ErrorCode.AuthErr)
 }
 
 // Claims is

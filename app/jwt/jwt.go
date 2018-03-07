@@ -34,26 +34,3 @@ var JwtHandlerAdmin = jwtmiddleware.New(jwtmiddleware.Config{
 	SigningMethod: jwt.SigningMethodHS256,
 	ErrorHandler:  handler.JWTError,
 })
-
-// GetUser is
-// func GetUser(tokenString string) models.AdminUser {
-// 	user := models.AdminUser{}
-
-// 	token, err := jwt.ParseWithClaims(tokenString, &user, func(token *jwt.Token) (interface{}, error) {
-// 		return []byte(jwtConf.AdminSecret), nil
-// 	})
-
-// 	if claims, ok := token.Claims.(*user); ok && token.Valid {
-// 		fmt.Printf("%v %v", claims)
-// 	} else {
-// 		fmt.Println(err)
-// 	}
-
-// 	fmt.Println(claims)
-// 	userID := claims["id"].(string)
-// 	fmt.Println(userID)
-// 	user.ID = userID
-// 	fmt.Println(user)
-// 	// user.Username = claims["username"].(string)
-// 	return user
-// }
