@@ -19,5 +19,16 @@ func GetPage(ctx iris.Context) models.PageModel {
 	page := models.PageModel{}
 
 	page.Num = pageNo
+
+	if page.Num < 1 {
+		page.Num = 1
+	}
+
+	if page.Size == 0 {
+		page.Size = 3
+	}
+
+	page.Offset = (page.Num - 1) * page.Size
+
 	return page
 }

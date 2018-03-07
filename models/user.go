@@ -131,16 +131,6 @@ func (s User) GetAll(page *PageModel) ([]User, error) {
 		err  error
 	)
 
-	if page.Num < 1 {
-		page.Num = 1
-	}
-
-	if page.Size == 0 {
-		page.Size = 3
-	}
-
-	offset := (page.Num - 1) * page.Size
-
 	tx := gorm.MysqlConn().Begin()
 
 	if err = tx.Find(&data).Count(&page.Count).Error; err != nil {
@@ -148,7 +138,7 @@ func (s User) GetAll(page *PageModel) ([]User, error) {
 		return data, err
 	}
 
-	if err = tx.Order("created_at desc").Offset(offset).Limit(page.Size).Find(&data).Error; err != nil {
+	if err = tx.Order("created_at desc").Offset(page.Offset).Limit(page.Size).Find(&data).Error; err != nil {
 		tx.Rollback()
 		return data, err
 	}

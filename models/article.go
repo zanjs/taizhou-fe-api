@@ -100,13 +100,6 @@ func (a Article) GetAll(page *PageModel) ([]Article, error) {
 		err  error
 	)
 
-	if page.Num < 1 {
-		page.Num = 1
-	}
-
-	pageSize := 2
-	offset := (page.Num - 1) * pageSize
-
 	tx := gorm.MysqlConn().Begin()
 
 	if err = tx.Preload("User").Preload("Pics").Find(&data).Count(&page.Count).Error; err != nil {
@@ -114,46 +107,33 @@ func (a Article) GetAll(page *PageModel) ([]Article, error) {
 		return data, err
 	}
 
-	if err = tx.Offset(offset).Limit(pageSize).Preload("User").Preload("Pics").Find(&data).Error; err != nil {
+	if err = tx.Offset(page.Offset).Limit(page.Size).Preload("User").Preload("Pics").Find(&data).Error; err != nil {
 		tx.Rollback()
 		return data, err
 	}
-	// tx.Model(&data).Related(&pics)
-	// tx.Model(&data).Related(&pics, "Pics")
-	// tx.Model(&data).Association("Pics")
 	tx.Commit()
 
 	return data, err
 }
 
-// GetAllNews is find
-func (a Article) GetAllNews(page *PageModel) ([]Article, error) {
+// GetAllType is 指定类型的文章
+func (a Article) GetAllType(page *PageModel, cType int) ([]Article, error) {
 	var (
 		data []Article
 		err  error
 	)
 
-	if page.Num < 1 {
-		page.Num = 1
-	}
-
-	pageSize := 2
-	offset := (page.Num - 1) * pageSize
-
 	tx := gorm.MysqlConn().Begin()
 
-	if err = tx.Preload("User").Preload("Pics").Where("content_type = ?", ArticleType.New).Find(&data).Count(&page.Count).Error; err != nil {
+	if err = tx.Preload("User").Preload("Pics").Where("content_type = ?", cType).Find(&data).Count(&page.Count).Error; err != nil {
 		tx.Rollback()
 		return data, err
 	}
 
-	if err = tx.Offset(offset).Limit(pageSize).Preload("User").Preload("Pics").Where("content_type = ?", ArticleType.New).Find(&data).Error; err != nil {
+	if err = tx.Offset(page.Offset).Limit(page.Size).Preload("User").Preload("Pics").Where("content_type = ?", cType).Find(&data).Error; err != nil {
 		tx.Rollback()
 		return data, err
 	}
-	// tx.Model(&data).Related(&pics)
-	// tx.Model(&data).Related(&pics, "Pics")
-	// tx.Model(&data).Association("Pics")
 	tx.Commit()
 
 	return data, err

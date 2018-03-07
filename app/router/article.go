@@ -2,7 +2,7 @@ package router
 
 import (
 	"anla.io/taizhou-fe-api/app/jwt"
-	"anla.io/taizhou-fe-api/handler"
+	"anla.io/taizhou-fe-api/handler/article"
 	"github.com/kataras/iris"
 )
 
@@ -10,13 +10,14 @@ import (
 func ArticleRouter(party iris.Party) {
 	o := party.Party("/article")
 	{
-		o.Get("/", handler.Article{}.All)
-		o.Get("/{id:string}", handler.Article{}.Get)
+		o.Get("/", article.Article{}.All)
+		o.Get("/type/{id:string}", article.Article{}.AllType)
+		o.Get("/{id:string}", article.Article{}.Get)
 	}
 	a := o.Party("/a")
 	a.Use(jwt.JwtHandler.Serve)
 	{
-		a.Post("/", handler.Article{}.Create)
+		a.Post("/", article.Article{}.Create)
 	}
 
 }
