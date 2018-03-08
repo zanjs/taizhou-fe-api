@@ -23,6 +23,14 @@ func JSON(ctx iris.Context, d interface{}) {
 	ctx.Application().Logger().Info("response is success data: " + d.(string))
 }
 
+// JSONSuccess ...
+func JSONSuccess(ctx iris.Context) {
+	ctx.JSON(&Response{
+		Code:    ErrorCode.SUCCESS,
+		Message: "success",
+	})
+}
+
 // JSONPage ...
 func JSONPage(ctx iris.Context, d interface{}, p interface{}) {
 	ctx.JSON(&Response{

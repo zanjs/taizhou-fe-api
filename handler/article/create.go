@@ -24,5 +24,5 @@ func (ctl Article) Create(ctx iris.Context) {
 		return
 	}
 
-	response.JSON(ctx, "发布成功")
+	response.JSONSuccess(ctx)
 }

@@ -42,5 +42,5 @@ func (ctl Article) Delete(ctx iris.Context) {
 		return
 	}
 
-	response.JSON(ctx, user)
+	response.JSONSuccess(ctx)
 }

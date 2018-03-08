@@ -45,5 +45,5 @@ func (ctl Article) Update(ctx iris.Context) {
 		return
 	}
 
-	response.JSON(ctx, "发布成功")
+	response.JSONSuccess(ctx)
 }
