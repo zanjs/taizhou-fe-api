@@ -14,6 +14,12 @@ type (
 		Name     string `json:"name" gorm:"type:varchar(100);unique"`
 		Sort     int    `json:"sort"`
 		Disabled bool   `json:"disabled" gorm:"default:'0'"`
+		Article  []*Article
+	}
+	// CategoryArticle is
+	CategoryArticle struct {
+		CategoryID string `json:"category_id"`
+		ArticleID  string `json:"article_id"`
 	}
 )
 

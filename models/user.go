@@ -8,16 +8,10 @@ import (
 )
 
 type (
-	// UserName is
-	UserName struct {
-		Username string `json:"username" gorm:"type:varchar(100);unique"`
-	}
-	// User is
-	User struct {
-		BaseModel
-		UserName
+	// UserInfo is
+	UserInfo struct {
+		Username     string `json:"username" gorm:"type:varchar(100);unique"`
 		Email        string `json:"email" gorm:"type:varchar(100);unique"`
-		Password     string `json:"-"`
 		Experience   uint   `json:"experience"`
 		ArticleCount uint   `json:"article_count"` // 文章数
 		CommentCount uint   `json:"comment_count"` // 评论数
@@ -29,17 +23,21 @@ type (
 		Role         int    `json:"role"`          //角色
 		StatusModel
 	}
+	// User is
+	User struct {
+		BaseModel
+		UserInfo
+		Password string `json:"-"`
+	}
 
 	// UserShort is
 	UserShort struct {
 		UUIDModel
-		UserName
+		UserInfo
 	}
 	// UserLogin is
 	UserLogin struct {
-		UserName
-		Role     int    `json:"role"` //角色
-		Email    string `json:"email" gorm:"type:varchar(100);unique"`
+		UserInfo
 		Type     int    `json:"type" gorm:"-"` // 登陆类型 1 = 后台， 不填写为普通用户
 		Password string `json:"password"`
 	}
@@ -122,6 +120,28 @@ func (s User) GetByID(id string) (User, error) {
 	tx.Commit()
 
 	return user, err
+}
+
+// Update is
+func (s *User) Update(m *UserLogin) error {
+	var err error
+
+	s.UpdatedAt = time.Now()
+	s.AvatarURL = m.AvatarURL
+	s.Signature = m.Signature
+	if m.Password != "" {
+		s.Password = m.Password
+	}
+
+	tx := gorm.MysqlConn().Begin()
+
+	if err = tx.Save(&s).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+
+	return err
 }
 
 // GetAll is find

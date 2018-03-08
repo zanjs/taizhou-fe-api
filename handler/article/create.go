@@ -8,19 +8,9 @@ import (
 
 // Create is
 func (ctl Article) Create(ctx iris.Context) {
-	u := models.Article{}
-	if err := ctx.ReadJSON(&u); err != nil {
-		response.JSONError(ctx, err.Error())
-		return
-	}
-
-	if u.Content == "" {
-		response.JSONError(ctx, "Content where?")
-		return
-	}
-
-	if u.ContentType == 0 {
-		response.JSONError(ctx, "ArticleType where?")
+	u, errStr := ctl.mid(ctx)
+	if errStr != "" {
+		response.JSONError(ctx, errStr)
 		return
 	}
 
@@ -34,5 +24,5 @@ func (ctl Article) Create(ctx iris.Context) {
 		return
 	}
 
-	response.JSON(ctx, u)
+	response.JSON(ctx, "发布成功")
 }

@@ -22,6 +22,7 @@ func UserRouter(party iris.Party) {
 	a.Use(jwt.JwtHandler.Serve)
 	{
 		a.Get("/me", user.User{}.GetMe)
+		a.Put("/me", user.User{}.Update)
 	}
 
 }

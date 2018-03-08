@@ -29,6 +29,7 @@ type (
 	Article struct {
 		IDModel
 		TimeAllModel
+		DescriptionModel
 		User          User          `gorm:"Table:user;foreignkey:UserID;AssociationForeignKey:id" json:"user,omitempty"`
 		Pics          []*ArticlePic `json:"pics,omitempty"`
 		UserID        string        `json:"user_id"`
@@ -37,7 +38,8 @@ type (
 		Content       string        `json:"content" gorm:"type:text"`
 		ViewCount     int           `json:"view_count"`
 		CommentCount  uint          `json:"comment_count"`
-		Categories    []Category    `gorm:"many2many:article_category;ForeignKey:ID;AssociationForeignKey:ID" json:"categories"`
+		CategoryID    string        `json:"category_id"`
+		Categories    []*Category   `gorm:"_" json:"categories"`
 		LastUserID    uint          `json:"last_user_id"` //最后一个回复话题的人
 		LastUser      User          `json:"last_user"`
 		LastCommentAt *time.Time    `json:"last_comment_at"`
@@ -158,14 +160,32 @@ func (a Article) Get(id string) (Article, error) {
 }
 
 // Update 更新保存
-func (a Article) Update(data *Article) error {
+func (a *Article) Update(data *Article) error {
 	var err error
+
+	a.CategoryID = data.CategoryID
+	a.Content = data.Content
+	a.Title = data.Title
+
 	tx := gorm.MysqlConn().Begin()
-	if err = tx.Save(&data).Error; err != nil {
+	if err = tx.Save(&a).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
 
+	tx.Commit()
+
+	return err
+}
+
+// Delete is
+func (a *Article) Delete() error {
+	var err error
+	tx := gorm.MysqlConn().Begin()
+	if err = tx.Delete(&a).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
 	tx.Commit()
 
 	return err

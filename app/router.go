@@ -28,7 +28,8 @@ func InitApp() {
 
 	// attach the file as logger, remember, iris' app logger is just an io.Writer.
 	app.Logger().SetOutput(config.NewLogFile())
-
+	// app.Use(iris.Gzip)
+	app.StaticWeb("/uploads", "./uploads")
 	app.Options("/*", handler.OptionsHandler)
 
 	app.Get("/", handler.IndexHand)

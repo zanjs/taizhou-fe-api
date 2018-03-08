@@ -18,6 +18,7 @@ func ArticleRouter(party iris.Party) {
 	a.Use(jwt.JwtHandler.Serve)
 	{
 		a.Post("/", article.Article{}.Create)
+		a.Delete("/", article.Article{}.Delete)
 	}
 
 }
