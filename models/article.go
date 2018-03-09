@@ -35,7 +35,7 @@ type (
 		UserID        string        `json:"user_id"`
 		ContentType   uint          `json:"content_type"`
 		Title         string        `json:"title" gorm:"type:varchar(100)"`
-		Content       string        `json:"content" gorm:"type:text"`
+		Content       string        `json:"content" gorm:"type:longtext"`
 		ViewCount     int           `json:"view_count"`
 		CommentCount  uint          `json:"comment_count"`
 		CategoryID    string        `json:"category_id"`
@@ -44,6 +44,8 @@ type (
 		LastUser      User          `json:"last_user"`
 		LastCommentAt *time.Time    `json:"last_comment_at"`
 		Disabled      bool          `json:"disabled" gorm:"default:'0'"`
+		NoComment     bool          `json:"no_comment" gorm:"default:'0'"`
+		ToTop         bool          `json:"to_top" gorm:"default:'0'"`
 		Comments      []*Comment    `json:"comments" gorm:"-"`
 	}
 )

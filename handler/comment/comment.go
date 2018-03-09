@@ -18,8 +18,8 @@ type (
 
 // Save is
 func (ctl Comment) Save(ctx iris.Context) {
-	u := &models.Comment{}
-	if err := ctx.ReadJSON(u); err != nil {
+	u := models.Comment{}
+	if err := ctx.ReadJSON(&u); err != nil {
 		response.JSONError(ctx, err.Error())
 		return
 	}
@@ -44,11 +44,15 @@ func (ctl Comment) Save(ctx iris.Context) {
 
 	user := ctl.GetUser(ctx)
 
+	if user.ID == "" {
+		response.JSONError(ctx, "jwt no find")
+	}
+
 	fmt.Println(user)
 
 	u.UserID = user.ID
 
-	err = models.Comment{}.Create(u)
+	err = models.Comment{}.Create(&u)
 	if err != nil {
 		response.JSONError(ctx, "留言失败"+err.Error())
 		return
@@ -56,7 +60,7 @@ func (ctl Comment) Save(ctx iris.Context) {
 
 	articel.CommentCount++
 
-	err = models.Article{}.Update(&articel)
+	err = articel.Update(&articel)
 
 	if err != nil {
 		fmt.Println("更新留言数量错误:" + err.Error())

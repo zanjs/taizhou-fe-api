@@ -4,6 +4,7 @@ import (
 	"anla.io/taizhou-fe-api/app/jwt"
 	"anla.io/taizhou-fe-api/handler/article"
 	"anla.io/taizhou-fe-api/handler/comment"
+	"anla.io/taizhou-fe-api/middleware"
 	"github.com/kataras/iris"
 )
 
@@ -15,7 +16,7 @@ func CommentRouter(party iris.Party) {
 		o.Get("/{id:string}", article.Article{}.Get)
 	}
 	a := o.Party("/a")
-	a.Use(jwt.JwtHandler.Serve)
+	a.Use(jwt.JwtHandler.Serve, middleware.User{}.GetUserCheck)
 	{
 		a.Post("/", comment.Comment{}.Save)
 	}
